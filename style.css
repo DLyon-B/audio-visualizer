@@ -1,0 +1,63 @@
+body {
+    background-color: #1E1E1E;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 30px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.container {
+    background: #2A2A2A;
+    padding: 25px;
+    border-radius: 12px;
+    width: 85%;
+    margin: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.controls .btn,
+.effects .efx-btn {
+    background: #3A3A3A;
+    border: none;
+    color: white;
+    margin: 5px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn:hover, .efx-btn:hover {
+    background: #4A4A4A;
+}
+
+.volume-section {
+    margin: 20px 0;
+}
+
+#volumeSlider {
+    width: 300px;
+}
+
+#visualizer {
+    background: #1F1F1F;
+    margin-top: 20px;
+    border-radius: 12px;
+    width: 100%;
+}
+
+.file-picker {
+    margin: 20px 0;
+}
+
+.file-picker label {
+    margin-right: 10px;
+    font-size: 16px;
+}

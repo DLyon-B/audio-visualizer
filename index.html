@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1 class="title">Audio Visualization Web</h1>
+
+    <div class="container">
+
+        <!-- Audio Controls -->
+        <div class="controls">
+            <button id="playBtn" class="btn">Play</button>
+            <button id="pauseBtn" class="btn">Pause</button>
+            <button id="stopBtn" class="btn">Stop</button>
+        </div>
+
+        <!-- Volume Slider -->
+        <div class="volume-section">
+            <label for="volumeSlider">Volume:</label>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+        </div>
+
+        <!-- Audio Element -->
+        <audio id="audioPlayer" src="assets/sample.mp3"></audio>
+
+        <!-- Visualizer Canvas -->
+        <canvas id="visualizer" width="900" height="200"></canvas>
+
+        <!-- Effects Section -->
+        <div class="effects">
+            <button id="fadeInBtn" class="efx-btn">Fade In</button>
+            <button id="fadeOutBtn" class="efx-btn">Fade Out</button>
+            <button id="bassBoostBtn" class="efx-btn">Bass Boost</button>
+        </div>
+
+        <!-- File Picker -->
+        <div class="file-picker">
+            <label for="audioFile">Pilih File Audio:</label>
+            <input type="file" id="audioFile" accept="audio/*">
+        </div>
+
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
