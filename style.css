@@ -124,3 +124,22 @@ body {
     border-radius: 5px;
     position: relative;
 }
+.visualizer-mode {
+    margin-top: 20px;
+}
+
+.mode-btn {
+    background: #3A3A3A;
+    border: none;
+    color: white;
+    margin: 5px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mode-btn:hover {
+    background: #4C8DFF;
+}

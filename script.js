@@ -129,3 +129,83 @@ function formatTime(sec) {
 progressBar.addEventListener("input", () => {
     audio.currentTime = progressBar.value;
 });
+
+const bufferBar = document.getElementById("bufferBar");
+
+// Update buffer bar setiap audio melakukan buffering
+audio.addEventListener("progress", () => {
+    if (audio.buffered.length > 0) {
+        let bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
+        let duration = audio.duration;
+
+        if (duration > 0) {
+            let bufferPercent = (bufferedEnd / duration) * 100;
+            bufferBar.style.width = bufferPercent + "%";
+        }
+    }
+});
+let visualizerMode = "bars";  // default
+document.getElementById("barModeBtn").onclick = () => {
+    visualizerMode = "bars";
+};
+
+document.getElementById("waveModeBtn").onclick = () => {
+    visualizerMode = "wave";
+};
+function drawVisualizer() {
+    requestAnimationFrame(drawVisualizer);
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (visualizerMode === "bars") {
+        drawBars(dataArray, bufferLength);
+    } else if (visualizerMode === "wave") {
+        drawWaveform(dataArray, bufferLength);
+    }
+}
+drawVisualizer();
+
+function drawBars(dataArray, bufferLength) {
+    analyser.getByteFrequencyData(dataArray);
+
+    const barWidth = (canvas.width / bufferLength);
+
+    let x = 0;
+    for (let i = 0; i < bufferLength; i++) {
+        const barHeight = dataArray[i];
+        ctx.fillStyle = "#4C8DFF";
+        ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+        x += barWidth;
+    }
+}
+
+function drawWaveform(dataArray, bufferLength) {
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#4C8DFF";
+
+    ctx.beginPath();
+
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0; // normalize
+        const y = (v * canvas.height) / 2;
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+    }
+
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+}
