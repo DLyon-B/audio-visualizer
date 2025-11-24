@@ -105,3 +105,27 @@ fileInput.addEventListener("change", function() {
     audio.play();
     audioCtx.resume();
 });
+
+const progressBar = document.getElementById("progressBar");
+const currentTimeText = document.getElementById("currentTime");
+const durationTimeText = document.getElementById("durationTime");
+
+audio.addEventListener("loadedmetadata", () => {
+    progressBar.max = audio.duration;
+    durationTimeText.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+    progressBar.value = audio.currentTime;
+    currentTimeText.textContent = formatTime(audio.currentTime);
+});
+
+function formatTime(sec) {
+    const minutes = Math.floor(sec / 60);
+    const seconds = Math.floor(sec % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+progressBar.addEventListener("input", () => {
+    audio.currentTime = progressBar.value;
+});
