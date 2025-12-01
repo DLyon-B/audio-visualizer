@@ -12,7 +12,7 @@
 
 <div class="container">
 
-    <!-- VOLUME SECTION + TOOLTIP -->
+    <!-- VOLUME SECTION -->
     <div class="volume-section">
         <label for="volumeSlider" class="tip"
             data-tip="Mengatur besar kecilnya energi suara yang keluar dari audio.">
@@ -21,27 +21,34 @@
         <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
     </div>
 
-    <!-- AUDIO CONTROL ICONS (CENTERED) -->
+    <!-- AUDIO CONTROL ICONS -->
     <div class="controls">
         <button id="playBtn" class="btn icon-btn tip"
             data-tip="Memulai pemutaran audio.">
-            <svg width="28" height="28" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24">
+                <path fill="white" d="M8 5v14l11-7z"/>
+            </svg>
         </button>
 
         <button id="pauseBtn" class="btn icon-btn tip"
             data-tip="Menjeda pemutaran audio sementara.">
-            <svg width="28" height="28" viewBox="0 0 24 24"><path fill="white" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24">
+                <path fill="white" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
         </button>
 
         <button id="stopBtn" class="btn icon-btn tip"
             data-tip="Menghentikan pemutaran audio dan mengulang dari awal.">
-            <svg width="28" height="28" viewBox="0 0 24 24"><path fill="white" d="M6 6h12v12H6z"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24">
+                <path fill="white" d="M6 6h12v12H6z"/>
+            </svg>
         </button>
     </div>
 
     <!-- FILE PICKER -->
     <div class="file-picker">
-        <label for="audioFile" class="tip" data-tip="Memuat file audio (.mp3, .wav, .ogg, dll) untuk divisualisasikan.">
+        <label for="audioFile" class="tip"
+            data-tip="Memuat file audio (.mp3, .wav, dll) untuk divisualisasikan.">
             Pilih File Audio:
         </label>
         <input type="file" id="audioFile" accept="audio/*">
@@ -49,11 +56,10 @@
 
     <!-- PROGRESS + BUFFER -->
     <div class="progress-container">
-
         <div id="bufferBar"></div>
 
         <input type="range" id="progressBar" value="0" min="0" max="100" step="1"
-            class="tip" data-tip="Menunjukkan bagian audio yang sedang diputar dan memungkinkan navigasi ke bagian lain.">
+            class="tip" data-tip="Menunjukkan bagian audio yang sudah dan sedang diputar.">
 
         <div class="time-info">
             <span id="currentTime">0:00</span>
@@ -69,45 +75,50 @@
         class="tip" data-tip="Menampilkan visualisasi amplitudo atau bentuk gelombang suara secara real-time.">
     </canvas>
 
-    <!-- EFFECTS -->
+    <!-- EFFECT BUTTONS -->
     <div class="effects">
         <button id="fadeInBtn" class="efx-btn tip"
-            data-tip="Meningkatkan volume suara secara perlahan dari 0 ke level normal.">
-            Fade In
-        </button>
+            data-tip="Meningkatkan volume secara perlahan.">Fade In</button>
 
         <button id="fadeOutBtn" class="efx-btn tip"
-            data-tip="Menurunkan volume suara secara perlahan hingga tidak terdengar.">
-            Fade Out
-        </button>
+            data-tip="Menurunkan volume secara perlahan hingga hilang.">Fade Out</button>
 
         <button id="bassBoostBtn" class="efx-btn tip"
-            data-tip="Menambah kekuatan suara pada frekuensi rendah sehingga bass terdengar lebih kuat.">
-            Bass Boost
-        </button>
+            data-tip="Menguatkan suara pada frekuensi bass.">Bass Boost</button>
     </div>
 
     <!-- VISUALIZER MODE -->
     <div class="visualizer-mode">
         <button id="barModeBtn" class="mode-btn active tip"
-            data-tip="Visualisasi amplitudo dalam bentuk bar.">
-            Bar Mode
-        </button>
+            data-tip="Visualisasi suara dalam bentuk batang frekuensi.">Bar Mode</button>
 
         <button id="waveModeBtn" class="mode-btn tip"
-            data-tip="Visualisasi bentuk gelombang suara seiring waktu.">
-            Waveform Mode
+            data-tip="Visualisasi bentuk gelombang suara.">Waveform Mode</button>
+    </div>
+
+    <!-- MODE PEMBELAJARAN -->
+    <div class="learning-mode">
+        <button id="ampLearnBtn" class="learn-btn tip"
+            data-tip="Pelajari hubungan amplitude dengan keras lembut suara.">
+            Belajar Amplitude
+        </button>
+
+        <button id="freqLearnBtn" class="learn-btn tip"
+            data-tip="Pelajari hubungan frekuensi dengan tinggi rendah nada.">
+            Belajar Frequency
         </button>
     </div>
+
+    <div id="learnText" class="learn-text"></div>
 
     <!-- EDUKASI AUDIO LABEL -->
     <div class="audio-info">
 
-        <p class="tip" data-tip="Amplitude menunjukkan besar energi gelombang suara. Semakin besar amplitude, semakin keras suara.">
+        <p class="tip" data-tip="Amplitude adalah besar energi gelombang suara. Semakin tinggi nilai amplitude, semakin keras bunyi.">
             Amplitude: <span id="ampValue">0</span> dB
         </p>
 
-        <p class="tip" data-tip="Frekuensi menunjukkan tinggi rendah nada. Nilai ini dalam Hertz (Hz).">
+        <p class="tip" data-tip="Frekuensi adalah jumlah getaran per detik (Hz). Semakin besar frekuensi, semakin tinggi nadanya.">
             Frekuensi Dominan: <span id="freqValue">0</span> Hz
         </p>
 

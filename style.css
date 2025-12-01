@@ -1,4 +1,4 @@
-/* ===== GLOBAL ANIMATED BACKGROUND ===== */
+/* ===== GLOBAL BACKGROUND ANIMATION ===== */
 body {
     margin: 0;
     padding: 30px;
@@ -17,81 +17,79 @@ body {
     100% { background-position: 0% 50% }
 }
 
-/* ===== CONTAINER ===== */
+/* ===== MAIN CONTAINER ===== */
 .container {
     background: rgba(20, 20, 20, 0.60);
     padding: 25px;
     width: 85%;
     margin: auto;
     border-radius: 14px;
-    box-shadow: 0 5px 24px rgba(0,0,0,0.45);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
 }
 
 .title {
     font-size: 32px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
-/* ===== SLIDER VOLUME ===== */
+/* ===== VOLUME SECTION ===== */
 .volume-section {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 16px;
 }
 
-/* ===== AUDIO CONTROL ICONS ===== */
+/* ===== PLAYER CONTROLS (ICONS) ===== */
 .controls {
-    margin-top: 15px;
+    margin-top: 16px;
     display: flex;
     justify-content: center;
-    gap: 18px;
+    gap: 20px;
 }
 
 .icon-btn {
-    width: 48px;
-    height: 46px;
+    width: 50px;
+    height: 48px;
     border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #3A3A3A;
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.25s;
 }
 .icon-btn:hover {
     background: #4C8DFF;
-    box-shadow: 0 0 12px rgba(76,141,255,0.8);
+    box-shadow: 0 0 12px rgba(76,141,255,0.85);
 }
-.icon-btn svg {
-    pointer-events: none;
-}
+.icon-btn svg { pointer-events: none; }
 
-/* ===== GENERIC BUTTON STYLES ===== */
-.btn, .efx-btn, .mode-btn {
+/* ===== GENERIC BUTTON ===== */
+.btn, .efx-btn, .mode-btn, .learn-btn {
     background: #3A3A3A;
     border: none;
-    padding: 10px 18px;
     border-radius: 10px;
     color: white;
     cursor: pointer;
+    padding: 10px 18px;
     transition: 0.2s;
 }
 
-/* ===== ACTIVE BUTTON ===== */
+/* ===== ACTIVE STATE ===== */
 .active {
     background: #4C8DFF !important;
-    box-shadow: 0 0 12px rgba(76,141,255,0.9);
+    box-shadow: 0 0 14px rgba(76,141,255,1);
 }
 
 /* ===== FILE PICKER ===== */
 .file-picker {
-    margin-top: 20px;
+    margin-top: 18px;
 }
 
-/* ===== PROGRESS BAR ===== */
+/* ===== PROGRESS + BUFFER BAR ===== */
 .progress-container {
     width: 90%;
-    margin: 20px auto 6px auto;
+    margin: 20px auto 5px auto;
     position: relative;
 }
 
@@ -108,9 +106,9 @@ body {
 #progressBar {
     width: 100%;
     height: 6px;
+    background: #3D3D3D;
     border-radius: 6px;
     appearance: none;
-    background: #3D3D3D;
     outline: none;
 }
 
@@ -118,11 +116,11 @@ body {
     -webkit-appearance: none;
     width: 14px;
     height: 14px;
-    background: #4C8DFF;
     border-radius: 50%;
+    background: #4C8DFF;
 }
 
-/* TIMER — LEFT & RIGHT */
+/* ===== TIME POSITIONING ===== */
 .time-info {
     margin-top: 6px;
     display: flex;
@@ -131,12 +129,12 @@ body {
     color: #CCCCCC;
 }
 
-/* ===== CANVAS VISUALIZER ===== */
+/* ===== VISUALIZER ===== */
 #visualizer {
-    margin-top: 18px;
     width: 100%;
     height: 240px;
-    border-radius: 10px;
+    margin-top: 18px;
+    border-radius: 12px;
     background: rgba(10, 10, 10, 0.55);
 }
 
@@ -147,28 +145,45 @@ body {
 
 .efx-btn {
     margin: 6px;
-    background: #3A3A3A;
 }
 .efx-btn:hover {
     background: #4C8DFF;
 }
 .efx-btn.active {
     background: #4C8DFF !important;
-    box-shadow: 0 0 12px rgba(76,141,255,1);
+    box-shadow: 0 0 16px rgba(76,141,255,1);
 }
 
-/* ===== VISUALIZER MODE ===== */
+/* ===== VISUALIZER MODE BUTTONS ===== */
 .visualizer-mode {
     margin-top: 18px;
 }
-
 .mode-btn {
-    margin: 5px;
+    margin: 6px;
+}
+
+/* ===== LEARNING MODE ===== */
+.learning-mode {
+    margin-top: 20px;
+}
+.learn-btn {
+    margin: 6px;
+}
+.learn-btn:hover {
+    background: #4C8DFF;
+    box-shadow: 0 0 12px rgba(76,141,255,0.9);
+}
+.learn-text {
+    margin-top: 12px;
+    min-height: 36px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #B8DFFF;
 }
 
 /* ===== AUDIO INFO LABELS ===== */
 .audio-info {
-    margin-top: 20px;
+    margin-top: 18px;
     display: flex;
     justify-content: space-around;
     font-size: 16px;
@@ -191,19 +206,19 @@ body {
     left: 50%;
     bottom: 130%;
     transform: translateX(-50%);
-    background: rgba(10, 10, 10, 0.90);
-    color: #4C8DFF;
-    padding: 8px 12px;
-    font-size: 13px;
-    border-radius: 6px;
-    pointer-events: none;
-    white-space: nowrap;
     opacity: 0;
-    transition: 0.25s ease;
-    box-shadow: 0 0 12px rgba(76,141,255,0.65);
+    white-space: nowrap;
+    background: rgba(10,10,10,0.9);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4C8DFF;
+    box-shadow: 0 0 12px rgba(76,141,255,0.6);
+    transition: opacity .25s, bottom .25s;
+    pointer-events: none;
 }
 
 .tip:hover::after {
     opacity: 1;
-    bottom: 150%;
+    bottom: 155%;
 }
