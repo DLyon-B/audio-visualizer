@@ -1,32 +1,40 @@
-// ======= AUDIO SETUP =======
+/* === ELEMENT SELECTION === */
 const audio = document.getElementById("audioPlayer");
+const fileInput = document.getElementById("audioFile");
 const volumeSlider = document.getElementById("volumeSlider");
+const progressBar = document.getElementById("progressBar");
+const bufferBar = document.getElementById("bufferBar");
+const currentTimeText = document.getElementById("currentTime");
+const durationTimeText = document.getElementById("durationTime");
+const ampLabel = document.getElementById("ampValue");
+const freqLabel = document.getElementById("freqValue");
 
-// Web Audio API
+/* === WEB AUDIO API SETUP === */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const source = audioCtx.createMediaElementSource(audio);
 
+// Analyzer for visualization
 const analyser = audioCtx.createAnalyser();
 analyser.fftSize = 256;
 
+// Gain Node for volume
 const gainNode = audioCtx.createGain();
-const filter = audioCtx.createBiquadFilter();
 
-// Default filter (no bass boost)
-filter.type = "lowshelf";
-filter.frequency.value = 200;
-filter.gain.value = 0;
+// Bass boost filter
+const bass = audioCtx.createBiquadFilter();
+bass.type = "lowshelf";
+bass.frequency.value = 200;
+bass.gain.value = 0;
 
-// Connect nodes
-source.connect(filter);
-filter.connect(gainNode);
+// Connect audio graph
+source.connect(bass);
+bass.connect(gainNode);
 gainNode.connect(analyser);
 analyser.connect(audioCtx.destination);
 
-
-// ======= BUTTON CONTROLS =======
+/* === AUDIO PLAYER CONTROLS === */
 document.getElementById("playBtn").onclick = () => {
-    audioCtx.resume(); 
+    audioCtx.resume();
     audio.play();
 };
 
@@ -37,175 +45,143 @@ document.getElementById("stopBtn").onclick = () => {
     audio.currentTime = 0;
 };
 
+/* === VOLUME CONTROL === */
+volumeSlider.oninput = () => gainNode.gain.value = volumeSlider.value;
 
-// ======= VOLUME CONTROL =======
-volumeSlider.addEventListener("input", function () {
-    gainNode.gain.value = this.value;
+/* === FILE PICKER === */
+fileInput.onchange = () => {
+    audio.src = URL.createObjectURL(fileInput.files[0]);
+    audioCtx.resume();
+    audio.play();
+};
+
+/* === BUFFER BAR UPDATE === */
+audio.onprogress = () => {
+    if (audio.buffered.length > 0) {
+        bufferBar.style.width = (audio.buffered.end(0) / audio.duration) * 100 + "%";
+    }
+};
+
+/* === PROGRESS BAR & TIME UPDATE === */
+audio.addEventListener("loadedmetadata", () => {
+    progressBar.max = Math.floor(audio.duration);
+    durationTimeText.textContent = format(audio.duration);
 });
 
+audio.addEventListener("timeupdate", () => {
+    progressBar.value = audio.currentTime;
+    currentTimeText.textContent = format(audio.currentTime);
+    updateProgressColor();
+});
 
-// ======= VISUALIZER =======
+progressBar.oninput = () => audio.currentTime = progressBar.value;
+
+/* === PROGRESS BAR COLOR LOGIC === */
+function updateProgressColor() {
+    if (!audio.duration) return;
+    const p = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.background = `
+        linear-gradient(to right, #4C8DFF ${p}%, #3D3D3D ${p}%)
+    `;
+}
+
+/* === TIME FORMATTER === */
+function format(sec) {
+    return `${Math.floor(sec / 60)}:${("0" + Math.floor(sec % 60)).slice(-2)}`;
+}
+
+/* === VISUALIZER MODE (BARS / WAVEFORM) === */
+let mode = "bars";
+
+document.getElementById("barModeBtn").onclick = () =>
+    setMode("bars", "barModeBtn");
+
+document.getElementById("waveModeBtn").onclick = () =>
+    setMode("wave", "waveModeBtn");
+
+function setMode(newMode, id) {
+    mode = newMode;
+    document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+/* === VISUALIZER CANVAS === */
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 
-function drawBars() {
-    requestAnimationFrame(drawBars);
+function render() {
+    requestAnimationFrame(render);
 
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const len = analyser.frequencyBinCount;
+    const data = new Uint8Array(len);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    analyser.getByteFrequencyData(dataArray);
+    if (mode === "bars") {
+        analyser.getByteFrequencyData(data);
+        const barW = canvas.width / len;
+        let x = 0;
 
-    ctx.fillStyle = "#1F1F1F";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < len; i++) {
+            ctx.fillStyle = "#4C8DFF";
+            ctx.fillRect(x, canvas.height - data[i], barW - 2, data[i]);
+            x += barW;
+        }
+    } else {
+        analyser.getByteTimeDomainData(data);
+        ctx.beginPath();
+        ctx.strokeStyle = "#4C8DFF";
 
-    const barWidth = (canvas.width / bufferLength);
+        let x = 0;
+        const sliceWidth = canvas.width / len;
 
-    let x = 0;
-    dataArray.forEach(value => {
-        const barHeight = value;
-        ctx.fillStyle = "#4C8DFF";
-        ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
-        x += barWidth;
-    });
+        for (let i = 0; i < len; i++) {
+            let y = (data[i] / 128) * canvas.height / 2;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            x += sliceWidth;
+        }
+        ctx.stroke();
+    }
+
+    updateAudioInfo();
+}
+render();
+
+/* === AUDIO EDUCATION LABELS (AMPLITUDE + FREQUENCY) === */
+function updateAudioInfo() {
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+
+    const avg = data.reduce((a, b) => a + b) / data.length;
+    ampLabel.textContent = ((avg / 255) * 100).toFixed(1);
+
+    const maxIndex = data.indexOf(Math.max(...data));
+    const freq = maxIndex * (audioCtx.sampleRate / analyser.fftSize);
+    freqLabel.textContent = Math.floor(freq);
 }
 
-drawBars();
-
-
-// ======= EFFECTS =======
+/* === EFFECTS (FADE IN / OUT / BASS BOOST) === */
 document.getElementById("fadeInBtn").onclick = () => {
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 3);
+    toggleEffect("fadeInBtn");
 };
 
 document.getElementById("fadeOutBtn").onclick = () => {
     gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 3);
+    toggleEffect("fadeOutBtn");
 };
 
-let bassBoostOn = false;
-
+let bassOn = false;
 document.getElementById("bassBoostBtn").onclick = () => {
-    bassBoostOn = !bassBoostOn;
-    filter.gain.value = bassBoostOn ? 15 : 0;
+    bassOn = !bassOn;
+    bass.gain.value = bassOn ? 15 : 0;
+    document.getElementById("bassBoostBtn").classList.toggle("active");
 };
 
-// ===== FILE PICKER =====
-const fileInput = document.getElementById("audioFile");
-
-fileInput.addEventListener("change", function() {
-    const files = this.files;
-
-    if (files.length === 0) return;
-
-    const fileURL = URL.createObjectURL(files[0]);
-    audio.src = fileURL;
-
-    audio.play();
-    audioCtx.resume();
-});
-
-const progressBar = document.getElementById("progressBar");
-const currentTimeText = document.getElementById("currentTime");
-const durationTimeText = document.getElementById("durationTime");
-
-audio.addEventListener("loadedmetadata", () => {
-    progressBar.max = audio.duration;
-    durationTimeText.textContent = formatTime(audio.duration);
-});
-
-audio.addEventListener("timeupdate", () => {
-    progressBar.value = audio.currentTime;
-    currentTimeText.textContent = formatTime(audio.currentTime);
-});
-
-function formatTime(sec) {
-    const minutes = Math.floor(sec / 60);
-    const seconds = Math.floor(sec % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-}
-
-progressBar.addEventListener("input", () => {
-    audio.currentTime = progressBar.value;
-});
-
-const bufferBar = document.getElementById("bufferBar");
-
-// Update buffer bar setiap audio melakukan buffering
-audio.addEventListener("progress", () => {
-    if (audio.buffered.length > 0) {
-        let bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
-        let duration = audio.duration;
-
-        if (duration > 0) {
-            let bufferPercent = (bufferedEnd / duration) * 100;
-            bufferBar.style.width = bufferPercent + "%";
-        }
-    }
-});
-let visualizerMode = "bars";  // default
-document.getElementById("barModeBtn").onclick = () => {
-    visualizerMode = "bars";
-};
-
-document.getElementById("waveModeBtn").onclick = () => {
-    visualizerMode = "wave";
-};
-function drawVisualizer() {
-    requestAnimationFrame(drawVisualizer);
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (visualizerMode === "bars") {
-        drawBars(dataArray, bufferLength);
-    } else if (visualizerMode === "wave") {
-        drawWaveform(dataArray, bufferLength);
-    }
-}
-drawVisualizer();
-
-function drawBars(dataArray, bufferLength) {
-    analyser.getByteFrequencyData(dataArray);
-
-    const barWidth = (canvas.width / bufferLength);
-
-    let x = 0;
-    for (let i = 0; i < bufferLength; i++) {
-        const barHeight = dataArray[i];
-        ctx.fillStyle = "#4C8DFF";
-        ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
-        x += barWidth;
-    }
-}
-
-function drawWaveform(dataArray, bufferLength) {
-    analyser.getByteTimeDomainData(dataArray);
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#4C8DFF";
-
-    ctx.beginPath();
-
-    const sliceWidth = canvas.width / bufferLength;
-    let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i] / 128.0; // normalize
-        const y = (v * canvas.height) / 2;
-
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-    }
-
-    ctx.lineTo(canvas.width, canvas.height / 2);
-    ctx.stroke();
+/* === BUTTON ACTIVE EFFECT CONTROLLER === */
+function toggleEffect(id) {
+    const btn = document.getElementById(id);
+    btn.classList.add("active");
+    setTimeout(() => btn.classList.remove("active"), 3000);
 }
